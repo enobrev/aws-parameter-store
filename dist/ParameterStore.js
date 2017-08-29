@@ -12,7 +12,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class ParameterStore {
 
-    static setConfig(sKey, sSecret, sRegion = 'us-east-1') {
+    static setConfig(sKey, sSecret, sRegion) {
         _awsSdk2.default.config.update({
             accessKeyId: sKey,
             secretAccessKey: sSecret,
