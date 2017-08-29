@@ -1,28 +1,44 @@
 "use strict";
 
 import AWS from 'aws-sdk';
+import deepmerge from 'deepmerge';
+import async from 'async';
 
 export default class ParameterStore {
     static TYPE_STRING          = 'String';
     static TYPE_STRING_LIST     = 'StringList';
     static TYPE_STRING_SECURE   = 'SecureString';
 
-    static bHasConfig = false;
-
+    /**
+     *
+     * @param {String} sKey
+     * @param {String} sSecret
+     * @param {String} sRegion
+     */
     static setConfig(sKey, sSecret, sRegion) {
         AWS.config.update({
             accessKeyId:     sKey,
             secretAccessKey: sSecret,
             region:          sRegion
         });
-        ParameterStore.bHasConfig = true;
     }
 
-    static _getClient() {
-        if (!ParameterStore.bHasConfig) {
-            throw new Error('Please call ParameterStore.setConfig');
-        }
+    /**
+     * The JS SDK does not properly pull the region from the credentials file.  It can be set with an ENV value (AWS_REGION) or just set it explicitly here
+     * @param {String} sRegion
+     */
+    static setRegion(sRegion) {
+        AWS.config.update({
+            region: sRegion
+        });
+    }
 
+    /**
+     *
+     * @return {SSM}
+     * @private
+     */
+    static _getClient() {
         return new AWS.SSM();
     }
 
@@ -54,6 +70,25 @@ export default class ParameterStore {
             ),
             fCallback
         )
+    }
+
+    /**
+     *
+     * @param {Array} aPaths
+     * @param {Function} fCallback
+     */
+    static mergePathsAsObject (aPaths, fCallback) {
+        async.parallel(aPaths.map(sPath => async.apply(ParameterStore.objectFromPath, sPath)), (oError, aResults) => {
+            if (oError) {
+                return fCallback(oError);
+            }
+
+            if (aResults.length === 1) {
+                return fCallback(oError, aResults.pop())
+            }
+
+            fCallback(oError, deepmerge.all(aResults));
+        })
     }
 
     /**

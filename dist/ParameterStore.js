@@ -8,24 +8,48 @@ var _awsSdk = require('aws-sdk');
 
 var _awsSdk2 = _interopRequireDefault(_awsSdk);
 
+var _deepmerge = require('deepmerge');
+
+var _deepmerge2 = _interopRequireDefault(_deepmerge);
+
+var _async = require('async');
+
+var _async2 = _interopRequireDefault(_async);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class ParameterStore {
 
+    /**
+     *
+     * @param {String} sKey
+     * @param {String} sSecret
+     * @param {String} sRegion
+     */
     static setConfig(sKey, sSecret, sRegion) {
         _awsSdk2.default.config.update({
             accessKeyId: sKey,
             secretAccessKey: sSecret,
             region: sRegion
         });
-        ParameterStore.bHasConfig = true;
     }
 
-    static _getClient() {
-        if (!ParameterStore.bHasConfig) {
-            throw new Error('Please call ParameterStore.setConfig');
-        }
+    /**
+     * The JS SDK does not properly pull the region from the credentials file.  It can be set with an ENV value (AWS_REGION) or just set it explicitly here
+     * @param {String} sRegion
+     */
+    static setRegion(sRegion) {
+        _awsSdk2.default.config.update({
+            region: sRegion
+        });
+    }
 
+    /**
+     *
+     * @return {SSM}
+     * @private
+     */
+    static _getClient() {
         return new _awsSdk2.default.SSM();
     }
 
@@ -49,6 +73,25 @@ class ParameterStore {
         }
 
         ParameterStore._getClient().putParameter(ParameterStore._createRecord(sParameter, mValue, sType, bOverwrite), fCallback);
+    }
+
+    /**
+     *
+     * @param {Array} aPaths
+     * @param {Function} fCallback
+     */
+    static mergePathsAsObject(aPaths, fCallback) {
+        _async2.default.parallel(aPaths.map(sPath => _async2.default.apply(ParameterStore.objectFromPath, sPath)), (oError, aResults) => {
+            if (oError) {
+                return fCallback(oError);
+            }
+
+            if (aResults.length === 1) {
+                return fCallback(oError, aResults.pop());
+            }
+
+            fCallback(oError, _deepmerge2.default.all(aResults));
+        });
     }
 
     /**
@@ -253,4 +296,4 @@ exports.default = ParameterStore;
 ParameterStore.TYPE_STRING = 'String';
 ParameterStore.TYPE_STRING_LIST = 'StringList';
 ParameterStore.TYPE_STRING_SECURE = 'SecureString';
-ParameterStore.bHasConfig = false;
+//# sourceMappingURL=ParameterStore.js.map
