@@ -1,0 +1,31 @@
+{
+  "name": "aws-parameter-store",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "author": {
+    "name": "Mark Armendariz",
+    "email": "src@enobrev.com",
+    "url": "https://github.com/enobrev"
+  },
+  "repository": {
+    "type": "git",
+    "url":  "https://github.com/enobrev/aws-parameter-store.git"
+  },
+  "main": "./dist/ParameterStore.js",
+  "scripts": {
+    "build": "make",
+    "watch": "make watch",
+    "clean": "make clean"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.104.0",
+    "deepmerge": "^1.5.1"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0"
+  }
+}
