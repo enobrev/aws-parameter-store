@@ -61,7 +61,11 @@ class ParameterStore {
      * @param {Boolean} bOverwrite
      * @param {Function} fCallback
      */
-    static put(sParameter, mValue, sType = ParameterStore.TYPE_STRING, bOverwrite = true, fCallback) {
+    static put(sParameter, mValue) {
+        var sType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ParameterStore.TYPE_STRING;
+        var bOverwrite = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+        var fCallback = arguments[4];
+
         if (typeof sType === 'function') {
             fCallback = sType;
             sType = ParameterStore.TYPE_STRING;
@@ -81,7 +85,9 @@ class ParameterStore {
      * @param {Function} fCallback
      */
     static mergePathsAsObject(aPaths, fCallback) {
-        _async2.default.parallel(aPaths.map(sPath => _async2.default.apply(ParameterStore.objectFromPath, sPath)), (oError, aResults) => {
+        _async2.default.parallel(aPaths.map(function (sPath) {
+            return _async2.default.apply(ParameterStore.objectFromPath, sPath);
+        }), function (oError, aResults) {
             if (oError) {
                 return fCallback(oError);
             }
@@ -112,7 +118,7 @@ class ParameterStore {
      * @param {Function} fCallback
      */
     static getValue(sParameter, fCallback) {
-        ParameterStore.get(sParameter, (oError, oParameter) => {
+        ParameterStore.get(sParameter, function (oError, oParameter) {
             if (oError) {
                 return fCallback(oError);
             }
@@ -127,19 +133,22 @@ class ParameterStore {
      * @param {Boolean} bStrip
      * @param {Function} fCallback
      */
-    static objectFromPath(sPath, bStrip = true, fCallback) {
+    static objectFromPath(sPath) {
+        var bStrip = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        var fCallback = arguments[2];
+
         if (typeof bStrip === 'function') {
             fCallback = bStrip;
             bStrip = true;
         }
 
-        ParameterStore.getByPath(sPath, bStrip, (oError, oCollection) => {
+        ParameterStore.getByPath(sPath, bStrip, function (oError, oCollection) {
             if (oError) {
                 return fCallback(oError);
             }
 
-            let oJoined = {};
-            Object.keys(oCollection).map(sKey => {
+            var oJoined = {};
+            Object.keys(oCollection).map(function (sKey) {
                 ParameterStore._assignByPath(oJoined, sKey, oCollection[sKey]);
             });
 
@@ -153,7 +162,10 @@ class ParameterStore {
      * @param {Boolean} bStrip
      * @param {Function} fCallback
      */
-    static getByPath(sPath, bStrip = true, fCallback) {
+    static getByPath(sPath) {
+        var bStrip = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        var fCallback = arguments[2];
+
         if (typeof bStrip === 'function') {
             fCallback = bStrip;
             bStrip = true;
@@ -161,14 +173,14 @@ class ParameterStore {
 
         sPath = '/' + sPath.replace(/^\/|\/$/g, '').replace() + '/';
 
-        ParameterStore._collectByPath(sPath, (oError, aCollection) => {
+        ParameterStore._collectByPath(sPath, function (oError, aCollection) {
             if (oError) {
                 return fCallback(oError);
             }
 
-            let oCollection = {};
-            aCollection.map(oParameter => {
-                const sName = bStrip ? oParameter.Name.replace(sPath, '') : oParameter.Name;
+            var oCollection = {};
+            aCollection.map(function (oParameter) {
+                var sName = bStrip ? oParameter.Name.replace(sPath, '') : oParameter.Name;
                 oCollection[sName] = ParameterStore._hydrateValue(oParameter);
             });
 
@@ -194,7 +206,7 @@ class ParameterStore {
             NextToken: sNextToken,
             Recursive: true,
             WithDecryption: true
-        }, (oError, oResults) => {
+        }, function (oError, oResults) {
             if (oError) {
                 return fCallback(oError);
             }
@@ -216,7 +228,7 @@ class ParameterStore {
      * @private
      */
     static _hydrateValue(oParameter) {
-        let sValue = oParameter.Type === ParameterStore.TYPE_STRING_LIST ? oParameter.Value.split(',') : oParameter.Value;
+        var sValue = oParameter.Type === ParameterStore.TYPE_STRING_LIST ? oParameter.Value.split(',') : oParameter.Value;
 
         // Boolean
         sValue = sValue === 'true' ? true : sValue;
@@ -251,11 +263,14 @@ class ParameterStore {
      * @return {{Name: *, Type: string, Value: *, Overwrite: boolean}}
      * @private
      */
-    static _createRecord(sParameter, mValue, sType = ParameterStore.TYPE_STRING, bOverwrite = true) {
-        const aParameter = sParameter.split('/');
-        const sEnvironment = aParameter[1];
+    static _createRecord(sParameter, mValue) {
+        var sType = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ParameterStore.TYPE_STRING;
+        var bOverwrite = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
 
-        let aStored = {
+        var aParameter = sParameter.split('/');
+        var sEnvironment = aParameter[1];
+
+        var aStored = {
             Name: sParameter,
             Type: sType,
             Value: mValue,
@@ -278,10 +293,12 @@ class ParameterStore {
      * @return {Object}
      * @private
      */
-    static _assignByPath(oObject, mPath, mValue, sSeparator = '/') {
-        let aKeys = mPath.split(sSeparator);
+    static _assignByPath(oObject, mPath, mValue) {
+        var sSeparator = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '/';
 
-        for (let i = 0; i < aKeys.length - 1; i++) {
+        var aKeys = mPath.split(sSeparator);
+
+        for (var i = 0; i < aKeys.length - 1; i++) {
             if (oObject[aKeys[i]] === undefined) {
                 oObject[aKeys[i]] = {};
             }
@@ -296,4 +313,3 @@ exports.default = ParameterStore;
 ParameterStore.TYPE_STRING = 'String';
 ParameterStore.TYPE_STRING_LIST = 'StringList';
 ParameterStore.TYPE_STRING_SECURE = 'SecureString';
-//# sourceMappingURL=ParameterStore.js.map
