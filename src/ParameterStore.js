@@ -120,6 +120,21 @@ export default class ParameterStore {
 
     /**
      *
+     * @param {String} sParameter
+     * @param {Function} fCallback
+     */
+    static getHydratedValue(sParameter, fCallback) {
+        ParameterStore.get(sParameter, (oError, oParameter) => {
+            if (oError) {
+                return fCallback(oError);
+            }
+
+            fCallback(null, ParameterStore._hydrateValue(oParameter.Parameter));
+        })
+    }
+
+    /**
+     *
      * @param {String} sPath
      * @param {Boolean} bStrip
      * @param {Function} fCallback

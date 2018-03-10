@@ -1,4 +1,4 @@
-.PHONY : production watch clean
+.PHONY : build production watch clean
 
 build: clean production
 
