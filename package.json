@@ -1,6 +1,6 @@
 {
   "name": "aws-parameter-store",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "private": true,
   "author": {
@@ -19,13 +19,12 @@
     "clean": "make clean"
   },
   "dependencies": {
-    "async": "^2.5.0",
-    "aws-sdk": "^2.104.0",
-    "deepmerge": "^1.5.1"
+    "async": "^2.6.0",
+    "aws-sdk": "^2.209.0",
+    "deepmerge": "^2.1.0"
   },
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.0"
+    "babel-preset-env": "^1.6.1"
   }
 }

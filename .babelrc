@@ -4,13 +4,12 @@
             "env",
             {
                 "targets": {
-                    "node": "5"
+                    "node": "8"
                 }
             }
         ]
     ],
     "plugins": [
-        "transform-class-properties",
-        "transform-object-rest-spread"
+        "transform-class-properties"
     ]
 }
