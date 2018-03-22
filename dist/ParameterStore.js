@@ -174,7 +174,9 @@ class ParameterStore {
             bStrip = true;
         }
 
-        sPath = '/' + sPath.replace(/^\/|\/$/g, '').replace() + '/';
+        if (sPath !== '/') {
+            sPath = '/' + sPath.replace(/^\/|\/$/g, '').replace() + '/';
+        }
 
         ParameterStore._collectByPath(sPath, (oError, aCollection) => {
             if (oError) {
